@@ -14,11 +14,10 @@ const createCell = ( DNA, Organelles ) =>
     : Organelles
 
 const createOrganelles = ( Organism, organellesPath ) => 
-( acc, name ) => { if ( acc ) 
-  return Object.assign( acc, {
-        [ name ]: require( organellesPath+name )( Organism )
-      } )
-  }
+  ( acc, name ) => 
+    Object.assign( acc, {
+      [ name ]: require( organellesPath+name )( Organism )
+    } )
 
 const Transcript = ( DNA, Organelles, middlewares = false ) => 
   ( middlewares )
@@ -36,18 +35,6 @@ const MakeLife = ( DNA, Molecule, Organelles ) =>
     
 module.exports = ( DNA, Molecule ) => MakeLife( DNA, Molecule, Organelles )
 
-/**
-
-Cytoplasm
-Além de servir de meio das reações metabólicas vitais 
-(glicólise anaeróbia e a síntese proteica), é onde se localizam 
-as mitocôndrias e o citoesqueleto, este mantendo a consistência e 
-a forma da célula. É também o local de armazenamento de substâncias 
-químicas indispensáveis à vida.
-
-https://pt.wikipedia.org/wiki/Citoplasma
-
-*/
 
 /**
 

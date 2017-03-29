@@ -247,6 +247,27 @@ module.exports = (Organism, query, {req, res}) => {
 
 ![](https://ka-perseus-images.s3.amazonaws.com/1d7e59bb1a3bfce307a001c2d4bbf763d0d11641.svg)
 
+## Citoplasma
+
+Além de servir de meio das reações metabólicas vitais 
+(glicólise anaeróbia e a síntese proteica), é onde se localizam 
+as mitocôndrias e o citoesqueleto, este mantendo a consistência e 
+a forma da célula. É também o local de armazenamento de substâncias 
+químicas indispensáveis à vida.
+
+fonte: [https://pt.wikipedia.org/wiki/Citoplasma](https://pt.wikipedia.org/wiki/Citoplasma)
+
+
+## Complexo de Golgi
+
+> A maior parte das vesículas transportadoras que saem do retículo endoplasmático, são transportadas até o complexo de Golgi, onde são modificadas, ordenadas e enviadas na direção dos seus destinos finais. A organela está presente na maior parte das células eucarióticas, mas tende a ser mais proeminente nas células de órgãos responsáveis pela secreção de certas substâncias, tais como o pâncreas, a hipófise e a tireoide.
+
+...
+
+> À medida que se movem de cisterna a cisterna através das pilhas, as proteínas são modificadas sucessivamente em cada estágio, até que a glicosilação se complete.
+
+fonte: [https://pt.wikipedia.org/wiki/Complexo_de_Golgi](https://pt.wikipedia.org/wiki/Complexo_de_Golgi)
+
 
 ## Fontes
 
@@ -263,17 +284,4 @@ module.exports = (Organism, query, {req, res}) => {
 
 ![](https://cdn.meme.am/cache/instances/folder230/47194230.jpg)
 
-/**
 
-Cytoplasm
-Além de servir de meio das reações metabólicas vitais 
-(glicólise anaeróbia e a síntese proteica), é onde se localizam 
-as mitocôndrias e o citoesqueleto, este mantendo a consistência e 
-a forma da célula. É também o local de armazenamento de substâncias 
-químicas indispensáveis à vida.
-
-https://pt.wikipedia.org/wiki/Citoplasma
-
-Complexo de Golgi
-https://pt.wikipedia.org/wiki/Complexo_de_Golgi
-*/
