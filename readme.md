@@ -247,6 +247,284 @@ module.exports = (Organism, query, {req, res}) => {
 
 ![](https://ka-perseus-images.s3.amazonaws.com/1d7e59bb1a3bfce307a001c2d4bbf763d0d11641.svg)
 
+## Factory - Organism
+
+> Como refatorar nosso code.
+
+
+```js
+
+const mongoose = require('mongoose')
+const moleculesPath = './../modules/'
+const organellesPath = './../_organelles/'
+
+module.exports = (DNA, Molecule) => {
+
+  const Organism = mongoose.model(DNA.name, Molecule) // deixar generico
+  const Organelles = require('./../_config/organism/organelles.default')
+
+  const OrganellesCell = 
+    (Array.isArray(DNA.organelles))
+      ? (Array.isArray(DNA.middlewares)) 
+          ? DNA.organelles.concat(Organelles).concat(DNA.middlewares)
+            : DNA.organelles.concat(Organelles)
+      : Organelles
+
+  const createOrganelles = (acc, name) => 
+    Object.assign(acc, {
+        [name]: require(organellesPath+name)(Organism, DNA.populate)})
+
+  return OrganellesCell.reduce(createOrganelles, {name: DNA.name})
+}
+
+```
+
+Primeiramente irei refatorar o teste se algo eh um array:
+
+```js
+
+const mongoose = require('mongoose')
+const moleculesPath = './../modules/'
+const organellesPath = './../_organelles/'
+
+module.exports = (DNA, Molecule) => {
+
+  const Organism = mongoose.model(DNA.name, Molecule)
+  const Organelles = require('./../_config/organism/organelles.default')
+
+  const OrganellesCell = 
+    ( DNA.organelles.map ) // Array.isArray(DNA.organelles)
+      ? ( DNA.middlewares.map ) // Array.isArray(DNA.middlewares)
+          ? DNA.organelles.concat(Organelles).concat(DNA.middlewares)
+            : DNA.organelles.concat(Organelles)
+      : Organelles
+
+  const createOrganelles = (acc, name) => 
+    Object.assign(acc, {
+        [name]: require(organellesPath+name)(Organism, DNA.populate)})
+
+
+  return OrganellesCell.reduce(createOrganelles, {name: DNA.name})
+}
+
+```
+
+Utilizei a técnica de checar se uma funcionalidade existe, no caso: `DNA.organelles.map`. Com isso saberemos se ela é ou nao um *array*.
+
+Deixando os requires no topo, saudades do C <3
+
+```js
+
+const mongoose = require('mongoose')
+const Organelles = require('./../_config/organism/organelles.default')
+const moleculesPath = './../modules/'
+const organellesPath = './../_organelles/'
+
+```
+
+
+Iniciamos a serie de remoção das funçōes de dentro do module.exports.
+
+```js
+
+const createOrganism = ( name, Molecule ) => mongoose.model( name, Molecule )
+
+module.exports = (DNA, Molecule) => {
+
+  const Organism = createOrganism( DNA.name, Molecule )
+//...
+}
+
+```
+
+
+
+Criei a createCell que cria a Cell, antiga OrganellesCell
+
+```js
+
+const mongoose = require('mongoose')
+const Organelles = require('./../_config/organism/organelles.default')
+const moleculesPath = './../modules/'
+const organellesPath = './../_organelles/'
+
+const createOrganism = ( name, Molecule ) => 
+  mongoose.model( name, Molecule )
+
+const createCell = ( DNA, Organelles ) =>
+  ( DNA.organelles.map ) // Array.isArray(DNA.organelles)
+    ? ( DNA.middlewares.map ) // Array.isArray(DNA.middlewares)
+        ? DNA.organelles.concat(Organelles).concat(DNA.middlewares)
+        : DNA.organelles.concat(Organelles)
+    : Organelles
+
+module.exports = (DNA, Molecule) => {
+
+  const Organism = createOrganism( DNA.name, Molecule )
+  const Cell = createCell( DNA, Organelles )
+
+  const createOrganelles = (acc, name) => 
+    Object.assign(acc, {
+        [name]: require(organellesPath+name)(Organism, DNA.populate)})
+
+
+  return Cell.reduce(createOrganelles, {name: DNA.name})
+}
+
+```
+
+Separei a fn createOrganelles onde injeto `Organism` e `DNA.populate` para que ela nao acesse vars globais/fora do seu escopo. Bem aqui: `return Cell.reduce(createOrganelles( Organism, DNA.populate), {name: DNA.name} )`
+
+
+```js
+
+const mongoose = require('mongoose')
+const Organelles = require('./../_config/organism/organelles.default')
+const moleculesPath = './../modules/'
+const organellesPath = './../_organelles/'
+
+const createOrganism = ( name, Molecule ) => 
+  mongoose.model( name, Molecule )
+
+const createCell = ( DNA, Organelles ) =>
+  ( DNA.organelles.map ) // Array.isArray(DNA.organelles)
+    ? ( DNA.middlewares.map ) // Array.isArray(DNA.middlewares)
+        ? DNA.organelles.concat(Organelles).concat(DNA.middlewares)
+        : DNA.organelles.concat(Organelles)
+    : Organelles
+
+const createOrganelles = ( Organism, populate ) => ( acc, name ) => 
+  Object.assign( acc, {
+    [name]: require( organellesPath+name )( Organism, populate )
+  } )
+
+module.exports = (DNA, Molecule) => {
+
+  const Organism = createOrganism( DNA.name, Molecule )
+  const Cell = createCell( DNA, Organelles )
+
+  return Cell.reduce(createOrganelles( Organism, DNA.populate ), {name: DNA.name} )
+}
+
+```
+
+Entao apenas substitui as fns createOrganism e createCell onde tinha seus valores salvos em suas consts.
+
+```js
+
+const mongoose = require('mongoose')
+const Organelles = require('./../_config/organism/organelles.default')
+const moleculesPath = './../modules/'
+const organellesPath = './../_organelles/'
+
+const createOrganism = ( name, Molecule ) => 
+  mongoose.model( name, Molecule )
+
+const createCell = ( DNA, Organelles ) =>
+  ( DNA.organelles.map ) // Array.isArray(DNA.organelles)
+    ? ( DNA.middlewares.map ) // Array.isArray(DNA.middlewares)
+        ? DNA.organelles.concat(Organelles).concat(DNA.middlewares)
+        : DNA.organelles.concat(Organelles)
+    : Organelles
+
+const createOrganelles = ( Organism, populate ) => ( acc, name ) => 
+  Object.assign( acc, {
+    [name]: require( organellesPath+name )( Organism, populate )
+  } )
+
+module.exports = (DNA, Molecule) => 
+  createCell( DNA, Organelles )
+    .reduce( createOrganelles( createOrganism( DNA.name, Molecule ), 
+                                DNA.populate), 
+                                {name: DNA.name} 
+                              )
+
+```
+
+
+Para finalizar encapsulei as fns chamadas no module.exports para deixar mais legivel, agora a fn mestre eh aMakeLife que executa a Mitosis na Cell.
+
+Foi coisa simples, mas espero que possa ajudar alguem e claro se vc quiser comentar com a sua refatoraçao eu agradeço.
+
+```js
+
+const mongoose = require('mongoose')
+const Organelles = require('./../_config/organism/organelles.default')
+const moleculesPath = './../modules/'
+const organellesPath = './../_organelles/'
+
+const createOrganism = ( name, Molecule ) => 
+  mongoose.model( name, Molecule )
+
+const createCell = ( DNA, Organelles ) =>
+  ( DNA.organelles.map ) // Array.isArray(DNA.organelles)
+    ? ( DNA.middlewares.map ) // Array.isArray(DNA.middlewares)
+        ? DNA.organelles.concat(Organelles).concat(DNA.middlewares)
+        : DNA.organelles.concat(Organelles)
+    : Organelles
+
+const createOrganelles = ( Organism, populate ) => ( acc, name ) => 
+  Object.assign( acc, {
+    [name]: require( organellesPath+name )( Organism, populate )
+  } )
+
+const Mitosis = ( DNA, Molecule ) => ( Cell ) => 
+  Cell.reduce( createOrganelles(  createOrganism( DNA.name, Molecule ), 
+                                  DNA.populate ), 
+                                {name: DNA.name} 
+                                )
+
+const MakeLife = ( DNA, Molecule, Organelles ) => 
+  Mitosis( DNA, Molecule )(createCell( DNA, Organelles ))
+    
+module.exports = ( DNA, Molecule ) => MakeLife( DNA, Molecule, Organelles ) 
+
+```
+
+Nao me aguentei e fui estudar pesquisar mais um pouco sobre Biologia e acabou virando nisso:
+
+```js
+
+const mongoose = require('mongoose')
+const Organelles = require('./../_config/organism/organelles.default')
+const moleculesPath = './../modules/'
+const organellesPath = './../_organelles/'
+
+const createCytoplasm = ( name, Molecule ) => 
+  mongoose.model( name, Molecule )
+
+const createCell = ( DNA, Organelles ) =>
+  ( DNA.organelles.map ) // Array.isArray(DNA.organelles)
+    ? ( DNA.middlewares.map ) // Array.isArray(DNA.middlewares)
+        ? Transcript( DNA, Organelles, `with middlewares` )
+        : Transcript( DNA, Organelles )
+    : Organelles
+
+const createOrganelles = ( Organism, organellesPath ) => 
+  ( acc, name ) => 
+    Object.assign( acc, {
+      [ name ]: require( organellesPath+name )( Organism )
+    } )
+
+const Transcript = ( DNA, Organelles, middlewares = false ) => 
+  ( middlewares )
+    ? DNA.organelles.concat(Organelles)
+    : DNA.organelles.concat(Organelles).concat(DNA.middlewares)
+
+const Synthesis = ( DNA, Molecule ) => 
+  createOrganelles( createCytoplasm( DNA.name, Molecule ), organellesPath )
+
+const Mitosis = ( DNA, Molecule ) => ( Cell ) => 
+  Cell.reduce( Synthesis( DNA, Molecule ), {name: DNA.name} )
+
+const MakeLife = ( DNA, Molecule, Organelles ) => 
+  Mitosis( DNA, Molecule )( createCell( DNA, Organelles ) )
+    
+module.exports = ( DNA, Molecule ) => MakeLife( DNA, Molecule, Organelles )
+
+```
+
+
 ## Citoplasma
 
 Além de servir de meio das reações metabólicas vitais 
