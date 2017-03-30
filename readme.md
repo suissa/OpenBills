@@ -247,7 +247,33 @@ module.exports = (Organism, query, {req, res}) => {
 
 ![](https://ka-perseus-images.s3.amazonaws.com/1d7e59bb1a3bfce307a001c2d4bbf763d0d11641.svg)
 
-## Factory - Organism
+## Factories <3
+
+> Where the love  lives.
+
+### Organism
+
+Nessa *factory* recebemos o `DNA` e a `Molecule` e retornamos o `Organism` que pode ser comparada com uma célula, sua saída é essa:
+
+```js
+
+{ name: 'Bill',
+   find: [Function],
+   create: [Function],
+   getSchema: [Function],
+   findByFilter: [Function],
+   findAllPopulate: [Function],
+   findById: [Function],
+   findByIdPopulate: [Function],
+   update: [Function],
+   remove: [Function],
+   findOne: [Function],
+   test: [Function] }
+
+```
+
+Logo retornamos um objeto com o nome do `Organism/Module` e sua organelas, que sao as açōes executadas a partir de uma rota (pensar em uma nomenclatura). 
+
 
 > Como refatorar nosso code.
 
@@ -260,7 +286,7 @@ const organellesPath = './../_organelles/'
 
 module.exports = (DNA, Molecule) => {
 
-  const Organism = mongoose.model(DNA.name, Molecule) // deixar generico
+  const Organism = mongoose.model(DNA.name, Molecule) 
   const Organelles = require('./../_config/organism/organelles.default')
 
   const OrganellesCell = 
