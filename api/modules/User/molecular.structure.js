@@ -3,5 +3,6 @@ module.exports = [
   'name', 
   'password',
   'email',
+  'perfil',
   'created_at'
 ]

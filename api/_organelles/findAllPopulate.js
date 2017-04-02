@@ -1,5 +1,5 @@
-const success = require('./ribosomes/success-200-json')
-const error = require('./ribosomes/error-json')
+const isSuccess = require('./ribosomes/success-200-json')
+const theseError = require('./ribosomes/error-json')
 const filterToPopulate = require('./helpers/filterToPopulate')
 const filterToPopulateArray = require('./helpers/filterToPopulateArray')
 
@@ -21,7 +21,6 @@ const areToPopulate = ( fields ) =>
     ? reduceFieldsToPopulate( fields )
     : reduceFieldsToPopulateArray( fields )
 
-
 module.exports = (Organism) => 
   (req, res) => {
     const thisFields = areToPopulate( getFields( Organism.schema.paths ) )
@@ -29,7 +28,7 @@ module.exports = (Organism) =>
     return Organism.findOne( {} )
                     .populate( thisFields )
                     .exec()
-                    .then( success( res ) )
-                    .catch( error( res ) )
+                    .then( isSuccess( res ) )
+                    .catch( theseError( res ) )
   }
 
