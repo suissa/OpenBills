@@ -3,17 +3,31 @@ const theseError = require('./ribosomes/error-json')
 const filterToPopulate = require('./helpers/filterToPopulate')
 const filterToPopulateArray = require('./helpers/filterToPopulateArray')
 
+const FNS = require(`./helpers/fns`)()
+// console.log(`FNS`, FNS)
+const getKeysFromObj = ( obj ) => Object.keys( obj )
+
+const toFlattened = ( a, b ) => a.concat(b)
+
 const removeStringIfHas = ( something ) => ( str ) =>
   !str.includes( something )
 
-const removeFieldWithoutRef = ( paths ) => ( field ) => 
-  paths[ field ].instance == 'ObjectID' ||
-  paths[ field ].instance == 'Array'
+const removeFieldWithoutRef = ( Organism ) => ( field ) => 
+  Organism.schema.paths[ field ].instance == 'ObjectID' ||
+  Organism.schema.paths[ field ].instance == 'Array'
 
-const getFields = ( paths ) => 
-  Object.keys( paths )
-        .filter( removeIfStringHas( '_' ) )
-        .filter( removeFieldWithoutRef( paths ) )
+const beginTestWith = ( arr , paths, fn ) => 
+  getKeysFromObj( paths ).filter( fn.f ).reduce( toFlattened, [])
+
+const fisihTestWith = ( arr , paths, fn ) => 
+  arr.filter( el => fn.f( el ))
+
+const getFields = ( paths, fns ) => 
+  fns.reduce( ( arr, fn ) => 
+    ( !arr.length )
+      ? beginTestWith( arr , paths, fn )
+      : fisihTestWith( arr , paths, fn )
+  , [] )
 
 const reduceFieldsToPopulate = ( fields ) =>
   fields.reduce( filterToPopulateArray, [] )
@@ -21,7 +35,7 @@ const reduceFieldsToPopulate = ( fields ) =>
 const reduceFieldsToPopulateArray = ( fields ) =>
   fields.reduce( filterToPopulate )
 
-const areToPopulate = ( req, fields ) =>
+const areToPopulate = ( req, fields ) => 
   ( req.query.entities )
     ? req.query
           .entities
@@ -32,16 +46,15 @@ const areToPopulate = ( req, fields ) =>
         : reduceFieldsToPopulateArray( fields )
 
 
-    // const fieldsToPopulate = (req.query.entities)
-    //                             ? req.query
-    //                                 .entities
-    //                                 .split(',')
-    //                                 .filter(filterToPopulate)
-    //                             : '' //depois pegar automatico
-
 module.exports = (Organism) => 
   (req, res) => {
-    const thisFields = areToPopulate( req, getFields( Organism.schema.paths ) )
+    const paths = Organism.schema.paths
+    const fns = [
+      { f: removeStringIfHas( '_' ) },
+      { f: removeFieldWithoutRef( Organism ) }
+    ]
+    const thisFields = areToPopulate( req, 
+                                      getFields( paths, fns ) )
 
     return Organism.findOne( {} )
                     .populate( thisFields )
