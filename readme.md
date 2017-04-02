@@ -9,8 +9,8 @@ Uma ideia parecida com essa é o [Patreon](), porém eu só preciso de doações
 ## Arquitetura
 
 
-## [Factories <3]()
+## [Factories <3](https://github.com/suissa/OpenBills/blob/master/how-i-do.md#factories-3)
 
 > Where the love  lives.
 
-### [Organism]()
+### [Organism](https://github.com/suissa/OpenBills/blob/master/how-i-do.md#organism)
