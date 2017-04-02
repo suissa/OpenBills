@@ -1,6 +1,12 @@
 const filterToPopulate = require('./helpers/filterToPopulate')
 const filterToPopulateArray = require('./helpers/filterToPopulateArray')
 
+const reduceFieldsToPopulate = ( fields ) =>
+  fields.reduce( filterToPopulateArray, [] )
+
+const reduceFieldsToPopulateArray = ( fields ) =>
+  fields.reduce( filterToPopulate )
+
 module.exports = (Organism) => 
   (req, res) => {
     // Callbacks Promise
@@ -13,19 +19,15 @@ module.exports = (Organism) =>
                     .filter(field => 
                       paths[field].instance == 'ObjectID' ||
                       paths[field].instance == 'Array' )
-                    
-    console.log(`fields`, fields)
 
+    const thisFields = ( fields.length > 1 )
+                          ? reduceFieldsToPopulate( fields )
+                          : reduceFieldsToPopulateArray( fields )
 
-    const fieldsToPopulate = ( fields.length > 1 )
-                                ? fields.reduce( filterToPopulateArray, [] )
-                                : fields.reduce( filterToPopulate )
-
-    console.log(`fieldsToPopulate`, fieldsToPopulate)
     return Organism.findOne( {} )
-      .populate(fieldsToPopulate)
+      .populate( thisFields )
       .exec()
-      .then(success)
-      .catch(error)
+      .then( success )
+      .catch( error )
   }
 
