@@ -1,6 +1,8 @@
 # Open Bills
 
-Uma ideia parecida com essa é o [Patreon](), porém eu só preciso de doações para pagar minhas basicas, logo pensei:
+Minha ideia é parecida com a plataforma [Patreon](),  porém eu preciso das doações para pagar minhas despesas básicas mensais
+
+Logo pensei: 
 
 > Pow preciso fazer um sistema de doacoes para que eu mostre quanto eu tenho de contas a pagar e para qual conta cada doaçao foi.
 >
