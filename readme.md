@@ -4,7 +4,7 @@ Minha ideia é parecida com a plataforma [Patreon](),  porém eu preciso das doa
 
 Logo pensei: 
 
-> Pow preciso fazer um sistema de doacoes para que eu mostre quanto eu tenho de contas a pagar e para qual conta cada doaçao foi.
+> Pow!! Preciso fazer um sistema de doações para que eu possa mostrar quanto eu tenho de contas a pagar, esse sistema mostrará abertamente ao doador em qual despesa sua doação foi utilizada.
 >
 > Além disso cada meta alcançada eu soltarei algum material inédito, que sera votada pelos doadores.
 
