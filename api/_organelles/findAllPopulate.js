@@ -1,62 +1,46 @@
 const isSuccess = require('./ribosomes/success-200-json')
 const theseError = require('./ribosomes/error-json')
-const filterToPopulate = require('./helpers/filterToPopulate')
-const filterToPopulateArray = require('./helpers/filterToPopulateArray')
-
 const FNS = require(`./helpers/fns`)()
-// console.log(`FNS`, FNS)
-const getKeysFromObj = ( obj ) => Object.keys( obj )
-
-const toFlattened = ( a, b ) => a.concat(b)
-
-const removeStringIfHas = ( something ) => ( str ) =>
-  !str.includes( something )
-
-const removeFieldWithoutRef = ( Organism ) => ( field ) => 
-  Organism.schema.paths[ field ].instance == 'ObjectID' ||
-  Organism.schema.paths[ field ].instance == 'Array'
 
 const beginTestWith = ( arr , paths, fn ) => 
-  getKeysFromObj( paths ).filter( fn.f ).reduce( toFlattened, [])
+  FNS.getKeysFromObj( paths )
+      .filter( fn.f )
+      .reduce( FNS.toFlattened, [] )
 
-const fisihTestWith = ( arr , paths, fn ) => 
-  arr.filter( el => fn.f( el ))
+const finishTestWith = ( arr , paths, fn ) => 
+  arr.filter( el => fn.f( el ) )
 
-const getFields = ( paths, fns ) => 
-  fns.reduce( ( arr, fn ) => 
-    ( !arr.length )
-      ? beginTestWith( arr , paths, fn )
-      : fisihTestWith( arr , paths, fn )
-  , [] )
+const toFieldsWithRef = ( paths ) => ( arr, fn ) => 
+  ( !arr.length )
+    ? beginTestWith( arr , paths, fn )
+    : finishTestWith( arr , paths, fn )
 
-const reduceFieldsToPopulate = ( fields ) =>
-  fields.reduce( filterToPopulateArray, [] )
+const reduceFieldsToPopulate = ( fields ) => 
+  ( fields.length )
+    ? fields.reduce( FNS.filterToPopulateArray, [] )
+    : fields.reduce( FNS.filterToPopulate )
 
-const reduceFieldsToPopulateArray = ( fields ) =>
-  fields.reduce( filterToPopulate )
+const reduceChoosenFieldsToPopulateArray = ( fields ) =>
+  fields.filter( FNS.filterToPopulate  )
 
 const areToPopulate = ( req, fields ) => 
   ( req.query.entities )
-    ? req.query
-          .entities
-          .split(',')
-          .filter( filterToPopulate( req ) )
-    : ( fields.length > 1 )
-        ? reduceFieldsToPopulate( fields )
-        : reduceFieldsToPopulateArray( fields )
-
+    ? reduceChoosenFieldsToPopulateArray( req.query.entities.split(',') )
+    : reduceFieldsToPopulate( fields )
 
 module.exports = (Organism) => 
   (req, res) => {
-    const paths = Organism.schema.paths
     const fns = [
-      { f: removeStringIfHas( '_' ) },
-      { f: removeFieldWithoutRef( Organism ) }
+      { f: FNS.removeStringIfHas( '_' ) },
+      { f: FNS.removeFieldWithoutRef( Organism ) }
     ]
-    const thisFields = areToPopulate( req, 
-                                      getFields( paths, fns ) )
+    const thisFields = areToPopulate( req, FNS.getFields( 
+                                              Organism.schema.paths, 
+                                              fns, 
+                                              toFieldsWithRef ) )
 
-    return Organism.findOne( {} )
+    console.log( `req.query.entities: `, req.query.entities )
+    return Organism.find( {} )
                     .populate( thisFields )
                     .exec()
                     .then( isSuccess( res ) )

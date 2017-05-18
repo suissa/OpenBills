@@ -1,5 +1,6 @@
 module.exports = [
   'active',
+  'name',
   'paymentType', 
   'amount',
   'donor', // doador

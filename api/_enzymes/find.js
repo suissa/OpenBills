@@ -1,2 +1,3 @@
-module.exports = ( Organism, query ) => Organism.find( query ).exec()
+module.exports = ( Organism, query ) => 
+  Organism.find( query ).exec()
 

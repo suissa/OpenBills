@@ -1,24 +1,20 @@
-const getKeysFromObj = ( obj ) => Object.keys( obj )
-const toFlattened = ( a, b ) => a.concat(b)
-const removeStringIfHas = ( something ) => ( str ) =>
-  !str.includes( something )
+const files = require(`./getFilesFromWithExtension`)( __dirname, `.js` )
+const fnNames = files.map( ( file ) => file.replace(`.js`, ``) )
 
-const fns = {
-  getKeysFromObj,
-  toFlattened,
-  removeStringIfHas
-}
+const reducer = ( obj, fn ) => 
+  Object.assign( {}, obj, { [fn]: require(`./${fn}`) })
+
+const fns = fnNames.reduce( reducer, {})
+
+const fnsToObject = ( fns ) => ( acc, cur ) => 
+  Object.assign( {}, acc, { [cur]: fns[cur] } )
 
 const getFns = ( list ) => 
   getKeysFromObj( fns )
-    .filter( fn => list.includes( fn ) )
-    .reduce( ( acc, cur ) => {
-      console.log(`cur`, cur)
-      const obj = { [cur]: fns[cur] }
-      return Object.assign( {}, acc, obj)
-    }, {})
+    .filter( ifExistsIn( list ) )
+    .reduce( fnsToObject( fns ), {})
 
-module.exports = ( list = [] ) =>
-  ( !list.length )
-    ? fns
-    : getFns( list )
+module.exports = ( list = `all` ) =>
+  ( list.map )
+    ? getFns( list )
+    : fns

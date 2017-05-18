@@ -1,3 +1,4 @@
+const MODULES_PATH = __dirname+'/modules'
 const db = require('./_config/db')
 const path = require('path')
 const express = require('express')
@@ -9,14 +10,13 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const compress = require('compression')
 const favicon = require('serve-favicon')
+
 // console.log('__dirname', __dirname)
 
 const http = require('http').Server(app);
 
 const io = require('socket.io').listen(5430);
 
-const MODULES_PATH = __dirname+'/modules'
-const modules = require('./_config/module/get.modules.js')(MODULES_PATH)
 const api = {}
 
 app.use(express.static(path.join(__dirname, '/public')));
@@ -44,12 +44,18 @@ app.use((req, res, next) => {
   next()
 })
 
+
 /* Cria as rotas dinamicamente a partir dos módulos */
+const modules = require('./_config/module/get.modules.js')(MODULES_PATH)
 const getRoutes = require('./_config/routes/get.routes')
 const createRoutes = require('./_config/routes/create.routes')(app)
 
-const maped = modules .map(getRoutes)
+const mapModules = ( modules ) => ( getRoutes ) => 
+  modules.map( getRoutes )
+
+const maped = mapModules( modules )( getRoutes ) 
 console.log('maped', maped)
+
 maped.reduce(createRoutes, app)
 
 app.get('/ping', (req, res, next) => res.send('pong') )
